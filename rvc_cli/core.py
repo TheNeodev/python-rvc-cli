@@ -5,6 +5,11 @@ import argparse
 import subprocess
 from functools import lru_cache
 from distutils.util import strtobool
+from rvc_cli.rvc.lib.tools.analyzer import analyze_audio
+from rvc_cli.rvc.lib.tools.launch_tensorboard import launch_tensorboard_pipeline
+from rvc_cli.rvc.lib.tools.model_download import model_download_pipeline
+
+
 
 now_dir = os.getcwd()
 sys.path.append(now_dir)
@@ -12,9 +17,6 @@ sys.path.append(now_dir)
 current_script_directory = os.path.dirname(os.path.realpath(__file__))
 logs_path = os.path.join(current_script_directory, "logs")
 
-from rvc_cli.rvc.lib.tools.analyzer import analyze_audio
-from rvc_cli.rvc.lib.tools.launch_tensorboard import launch_tensorboard_pipeline
-from rvc_cli.rvc.lib.tools.model_download import model_download_pipeline
 
 python = sys.executable
 
