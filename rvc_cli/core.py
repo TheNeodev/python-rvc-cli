@@ -25,7 +25,7 @@ python = sys.executable
 @lru_cache(maxsize=1)  # Cache only one result since the file is static
 def load_voices_data():
     with open(
-        os.path.join("rvc", "lib", "tools", "tts_voices.json"), "r", encoding="utf-8"
+        os.path.join("rvc_cli", "rvc", "lib", "tools", "tts_voices.json"), "r", encoding="utf-8"
     ) as file:
         return json.load(file)
 
@@ -348,7 +348,7 @@ def run_tts_script(
     sid: int = 0,
 ):
 
-    tts_script_path = os.path.join("rvc", "lib", "tools", "tts.py")
+    tts_script_path = os.path.join("rvc_cli", "rvc", "lib", "tools", "tts.py")
 
     if os.path.exists(output_tts_path):
         os.remove(output_tts_path)
