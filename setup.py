@@ -57,7 +57,7 @@ extras_require = {
 # Setup configuration
 setup(
     name="rvc_cli",
-    version="1.1.0",
+    version="1.2.0",
     packages=find_packages(include=["rvc_cli", "rvc_cli.*"]),
     install_requires=install_requires,
     extras_require=extras_require,
