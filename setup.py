@@ -9,13 +9,12 @@ install_requires = [
     "wget",
     "ffmpeg-python>=0.2.0",
     "faiss-cpu==1.7.3",
-    "librosa==0.9.2",
     "scipy==1.11.1",
     "soundfile==0.12.1",
     "noisereduce",
     "pedalboard",
     "stftpitchshift",
-    "yt-dlp",
+    "yt-dlp==2025.01.26",
     "torch==2.3.1",
     "torchaudio==2.3.1",
     "torchvision==0.18.1",
@@ -58,7 +57,7 @@ extras_require = {
 # Setup configuration
 setup(
     name="rvc_cli",
-    version="0.1.0",
+    version="1.1.0",
     packages=find_packages(include=["rvc_cli", "rvc_cli.*"]),
     install_requires=install_requires,
     extras_require=extras_require,
