@@ -2,6 +2,7 @@ import torch
 import json
 import os
 
+CONFIG_BASE_PATH = os.path.join("rvc_cli", "rvc", "configs")
 
 version_config_paths = [
     os.path.join("v1", "32000.json"),
@@ -28,7 +29,7 @@ def singleton(cls):
 class Config:
     def __init__(self):
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        self.is_half = self.device != "cpu"
+        self.is_half = self.device.startswith("cuda")
         self.gpu_name = (
             torch.cuda.get_device_name(int(self.device.split(":")[-1]))
             if self.device.startswith("cuda")
@@ -41,17 +42,24 @@ class Config:
     def load_config_json(self) -> dict:
         configs = {}
         for config_file in version_config_paths:
-            config_path = os.path.join("rvc_cli", "rvc", "configs", config_file)
-            with open(config_path, "r") as f:
-                configs[config_file] = json.load(f)
+            config_path = os.path.join(CONFIG_BASE_PATH, config_file)
+
+            if not os.path.exists(config_path):
+                print(f"[WARNING] Config file not found: {config_path}")
+                continue  # Skip missing config files
+
+            try:
+                with open(config_path, "r") as f:
+                    configs[config_file] = json.load(f)
+            except json.JSONDecodeError:
+                print(f"[ERROR] Failed to parse JSON in {config_path}")
+
         return configs
 
     def has_mps(self) -> bool:
-        # Check if Metal Performance Shaders are available - for macOS 12.3+.
         return torch.backends.mps.is_available()
 
     def has_xpu(self) -> bool:
-        # Check if XPU is available.
         return hasattr(torch, "xpu") and torch.xpu.is_available()
 
     def set_precision(self, precision):
@@ -59,51 +67,38 @@ class Config:
             raise ValueError("Invalid precision type. Must be 'fp32' or 'fp16'.")
 
         fp16_run_value = precision == "fp16"
-        preprocess_target_version = "3.7" if precision == "fp16" else "3.0"
-        preprocess_path = os.path.join(
-            os.path.dirname(__file__),
-            os.pardir,
-            "rvc",
-            "train",
-            "preprocess",
-            "preprocess.py",
-        )
-
         for config_path in version_config_paths:
-            full_config_path = os.path.join("rvc_cli", "rvc", "configs", config_path)
+            full_config_path = os.path.join(CONFIG_BASE_PATH, config_path)
+            if not os.path.exists(full_config_path):
+                print(f"[WARNING] Config file missing: {full_config_path}")
+                continue
+
             try:
                 with open(full_config_path, "r") as f:
                     config = json.load(f)
                 config["train"]["fp16_run"] = fp16_run_value
                 with open(full_config_path, "w") as f:
                     json.dump(config, f, indent=4)
-            except FileNotFoundError:
-                print(f"File not found: {full_config_path}")
+            except (FileNotFoundError, json.JSONDecodeError):
+                print(f"[ERROR] Failed to update {full_config_path}")
 
-        if os.path.exists(preprocess_path):
-            with open(preprocess_path, "r") as f:
-                preprocess_content = f.read()
-            preprocess_content = preprocess_content.replace(
-                "3.0" if precision == "fp16" else "3.7", preprocess_target_version
-            )
-            with open(preprocess_path, "w") as f:
-                f.write(preprocess_content)
-
-        return f"Overwritten preprocess and config.json to use {precision}."
+        return f"Set precision to {precision} in available config files."
 
     def get_precision(self):
         if not version_config_paths:
             raise FileNotFoundError("No configuration paths provided.")
 
-        full_config_path = os.path.join("rvc_cli",  "rvc", "configs", version_config_paths[0])
+        full_config_path = os.path.join(CONFIG_BASE_PATH, version_config_paths[0])
+        if not os.path.exists(full_config_path):
+            print(f"[ERROR] Config file missing: {full_config_path}")
+            return None
+
         try:
             with open(full_config_path, "r") as f:
                 config = json.load(f)
-            fp16_run_value = config["train"].get("fp16_run", False)
-            precision = "fp16" if fp16_run_value else "fp32"
-            return precision
-        except FileNotFoundError:
-            print(f"File not found: {full_config_path}")
+            return "fp16" if config["train"].get("fp16_run", False) else "fp32"
+        except json.JSONDecodeError:
+            print(f"[ERROR] JSON parsing failed in {full_config_path}")
             return None
 
     def device_config(self) -> tuple:
@@ -118,12 +113,10 @@ class Config:
             self.is_half = False
             self.set_precision("fp32")
 
-        # Configuration for 6GB GPU memory
         x_pad, x_query, x_center, x_max = (
             (3, 10, 60, 65) if self.is_half else (1, 6, 38, 41)
         )
         if self.gpu_mem is not None and self.gpu_mem <= 4:
-            # Configuration for 5GB GPU memory
             x_pad, x_query, x_center, x_max = (1, 5, 30, 32)
 
         return x_pad, x_query, x_center, x_max
@@ -147,10 +140,8 @@ class Config:
 def max_vram_gpu(gpu):
     if torch.cuda.is_available():
         gpu_properties = torch.cuda.get_device_properties(gpu)
-        total_memory_gb = round(gpu_properties.total_memory / 1024 / 1024 / 1024)
-        return total_memory_gb
-    else:
-        return "8"
+        return round(gpu_properties.total_memory / 1024 / 1024 / 1024)
+    return 8
 
 
 def get_gpu_info():
@@ -159,21 +150,10 @@ def get_gpu_info():
     if torch.cuda.is_available() or ngpu != 0:
         for i in range(ngpu):
             gpu_name = torch.cuda.get_device_name(i)
-            mem = int(
-                torch.cuda.get_device_properties(i).total_memory / 1024 / 1024 / 1024
-                + 0.4
-            )
+            mem = int(torch.cuda.get_device_properties(i).total_memory / 1024**3 + 0.4)
             gpu_infos.append(f"{i}: {gpu_name} ({mem} GB)")
-    if len(gpu_infos) > 0:
-        gpu_info = "\n".join(gpu_infos)
-    else:
-        gpu_info = "Unfortunately, there is no compatible GPU available to support your training."
-    return gpu_info
+    return "\n".join(gpu_infos) if gpu_infos else "No compatible GPU found."
 
 
 def get_number_of_gpus():
-    if torch.cuda.is_available():
-        num_gpus = torch.cuda.device_count()
-        return "-".join(map(str, range(num_gpus)))
-    else:
-        return "-"
+    return "-".join(map(str, range(torch.cuda.device_count()))) if torch.cuda.is_available() else "-"
