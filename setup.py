@@ -55,6 +55,10 @@ extras_require = {
 setup(
     name="rvc_cli",
     version="1.5.0",
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
+    readme="README.md",
+    license="MIT",
     packages=find_packages(include=["rvc_cli", "rvc_cli.*"]),
     install_requires=install_requires,
     extras_require=extras_require,
