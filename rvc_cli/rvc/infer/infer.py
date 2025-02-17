@@ -25,11 +25,11 @@ from pedalboard import (
 now_dir = os.getcwd()
 sys.path.append(now_dir)
 
-from rvc_cli,rvc.infer.pipeline import Pipeline as VC
+from rvc_cli.rvc.infer.pipeline import Pipeline as VC
 from rvc_cli.rvc.lib.utils import load_audio_infer, load_embedding
 from rvc_cli.rvc.lib.tools.split_audio import process_audio, merge_audio
-from .rvc_cli.rvc.lib.algorithm.synthesizers import Synthesizer
-from rvc_clirvc.configs.config import Config
+from rvc_cli.rvc.lib.algorithm.synthesizers import Synthesizer
+from rvc_cli.rvc.configs.config import Config
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
