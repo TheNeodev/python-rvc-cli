@@ -22,7 +22,7 @@ python = sys.executable
 
 @lru_cache(maxsize=None)
 def import_voice_converter():
-    from rvc.infer.infer import VoiceConverter
+    from rvc_cli.rvc.infer.infer import VoiceConverter
 
     return VoiceConverter()
 
