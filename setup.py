@@ -54,7 +54,7 @@ extras_require = {
 # Setup configuration
 setup(
     name="rvc_cli",
-    version="1.5.0",
+    version="1.6.0",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     readme="README.md",
