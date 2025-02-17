@@ -5,8 +5,6 @@ import argparse
 import subprocess
 from functools import lru_cache
 from distutils.util import strtobool
-from rvc_cli.rvc.lib.tools.analyzer import analyze_audio
-from rvc_cli.rvc.lib.tools.launch_tensorboard import launch_tensorboard_pipeline
 from rvc_cli.rvc.lib.tools.model_download import model_download_pipeline
 
 
@@ -318,136 +316,15 @@ def run_batch_infer_script(
 
     return f"Files from {input_folder} inferred successfully."
 
-
-# TTS
-def run_tts_script(
-    tts_file: str,
-    tts_text: str,
-    tts_voice: str,
-    tts_rate: int,
-    pitch: int,
-    filter_radius: int,
-    index_rate: float,
-    volume_envelope: int,
-    protect: float,
-    hop_length: int,
-    f0_method: str,
-    output_tts_path: str,
-    output_rvc_path: str,
-    pth_path: str,
-    index_path: str,
-    split_audio: bool,
-    f0_autotune: bool,
-    f0_autotune_strength: float,
-    clean_audio: bool,
-    clean_strength: float,
-    export_format: str,
-    f0_file: str,
-    embedder_model: str,
-    embedder_model_custom: str = None,
-    sid: int = 0,
-):
-
-    tts_script_path = os.path.join("rvc_cli", "rvc", "lib", "tools", "tts.py")
-
-    if os.path.exists(output_tts_path):
-        os.remove(output_tts_path)
-
-    command_tts = [
-        *map(
-            str,
-            [
-                python,
-                tts_script_path,
-                tts_file,
-                tts_text,
-                tts_voice,
-                tts_rate,
-                output_tts_path,
-            ],
-        ),
-    ]
-    subprocess.run(command_tts)
-    infer_pipeline = import_voice_converter()
-    infer_pipeline.convert_audio(
-        pitch=pitch,
-        filter_radius=filter_radius,
-        index_rate=index_rate,
-        volume_envelope=volume_envelope,
-        protect=protect,
-        hop_length=hop_length,
-        f0_method=f0_method,
-        audio_input_path=output_tts_path,
-        audio_output_path=output_rvc_path,
-        model_path=pth_path,
-        index_path=index_path,
-        split_audio=split_audio,
-        f0_autotune=f0_autotune,
-        f0_autotune_strength=f0_autotune_strength,
-        clean_audio=clean_audio,
-        clean_strength=clean_strength,
-        export_format=export_format,
-        f0_file=f0_file,
-        embedder_model=embedder_model,
-        embedder_model_custom=embedder_model_custom,
-        sid=sid,
-        formant_shifting=None,
-        formant_qfrency=None,
-        formant_timbre=None,
-        post_process=None,
-        reverb=None,
-        pitch_shift=None,
-        limiter=None,
-        gain=None,
-        distortion=None,
-        chorus=None,
-        bitcrush=None,
-        clipping=None,
-        compressor=None,
-        delay=None,
-        sliders=None,
-    )
-
-    return f"Text {tts_text} synthesized successfully.", output_rvc_path.replace(
-        ".wav", f".{export_format.lower()}"
-    )
-
-
-# Model information
-def run_model_information_script(pth_path: str):
-    print(model_information(pth_path))
-    return model_information(pth_path)
-
-
-# Model blender
-def run_model_blender_script(
-    model_name: str, pth_path_1: str, pth_path_2: str, ratio: float
-):
-    message, model_blended = model_blender(model_name, pth_path_1, pth_path_2, ratio)
-    return message, model_blended
-
-
-# Tensorboard
-def run_tensorboard_script():
-    launch_tensorboard_pipeline()
-
+   
 
 # Download
 def run_download_script(model_link: str):
     model_download_pipeline(model_link)
     return f"Model downloaded successfully."
 
+        
 
-# Audio analyzer
-def run_audio_analyzer_script(
-    input_path: str, save_plot_path: str = "logs/audio_analysis.png"
-):
-    audio_info, plot_path = analyze_audio(input_path, save_plot_path)
-    print(
-        f"Audio info of {input_path}: {audio_info}",
-        f"Audio file {input_path} analyzed successfully. Plot saved at: {plot_path}",
-    )
-    return audio_info, plot_path
 
 
 # Parse arguments
@@ -1461,211 +1338,6 @@ def parse_arguments():
         required=False,
     )
 
-    # Parser for 'tts' mode
-    tts_parser = subparsers.add_parser("tts", help="Run TTS inference")
-    tts_parser.add_argument(
-        "--tts_file", type=str, help="File with a text to be synthesized", required=True
-    )
-    tts_parser.add_argument(
-        "--tts_text", type=str, help="Text to be synthesized", required=True
-    )
-    tts_parser.add_argument(
-        "--tts_voice",
-        type=str,
-        help="Voice to be used for TTS synthesis.",
-        choices=locales,
-        required=True,
-    )
-    tts_parser.add_argument(
-        "--tts_rate",
-        type=int,
-        help="Control the speaking rate of the TTS. Values range from -100 (slower) to 100 (faster).",
-        choices=range(-100, 101),
-        default=0,
-    )
-    tts_parser.add_argument(
-        "--pitch",
-        type=int,
-        help=pitch_description,
-        choices=range(-24, 25),
-        default=0,
-    )
-    tts_parser.add_argument(
-        "--filter_radius",
-        type=int,
-        help=filter_radius_description,
-        choices=range(11),
-        default=3,
-    )
-    tts_parser.add_argument(
-        "--index_rate",
-        type=float,
-        help=index_rate_description,
-        choices=[(i / 10) for i in range(11)],
-        default=0.3,
-    )
-    tts_parser.add_argument(
-        "--volume_envelope",
-        type=float,
-        help=volume_envelope_description,
-        choices=[(i / 10) for i in range(11)],
-        default=1,
-    )
-    tts_parser.add_argument(
-        "--protect",
-        type=float,
-        help=protect_description,
-        choices=[(i / 10) for i in range(6)],
-        default=0.33,
-    )
-    tts_parser.add_argument(
-        "--hop_length",
-        type=int,
-        help=hop_length_description,
-        choices=range(1, 513),
-        default=128,
-    )
-    tts_parser.add_argument(
-        "--f0_method",
-        type=str,
-        help=f0_method_description,
-        choices=[
-            "crepe",
-            "crepe-tiny",
-            "rmvpe",
-            "fcpe",
-            "hybrid[crepe+rmvpe]",
-            "hybrid[crepe+fcpe]",
-            "hybrid[rmvpe+fcpe]",
-            "hybrid[crepe+rmvpe+fcpe]",
-        ],
-        default="rmvpe",
-    )
-    tts_parser.add_argument(
-        "--output_tts_path",
-        type=str,
-        help="Full path to save the synthesized TTS audio.",
-        required=True,
-    )
-    tts_parser.add_argument(
-        "--output_rvc_path",
-        type=str,
-        help="Full path to save the voice-converted audio using the synthesized TTS.",
-        required=True,
-    )
-    tts_parser.add_argument(
-        "--pth_path", type=str, help=pth_path_description, required=True
-    )
-    tts_parser.add_argument(
-        "--index_path", type=str, help=index_path_description, required=True
-    )
-    tts_parser.add_argument(
-        "--split_audio",
-        type=lambda x: bool(strtobool(x)),
-        choices=[True, False],
-        help=split_audio_description,
-        default=False,
-    )
-    tts_parser.add_argument(
-        "--f0_autotune",
-        type=lambda x: bool(strtobool(x)),
-        choices=[True, False],
-        help=f0_autotune_description,
-        default=False,
-    )
-    tts_parser.add_argument(
-        "--f0_autotune_strength",
-        type=float,
-        help=clean_strength_description,
-        choices=[(i / 10) for i in range(11)],
-        default=1.0,
-    )
-    tts_parser.add_argument(
-        "--clean_audio",
-        type=lambda x: bool(strtobool(x)),
-        choices=[True, False],
-        help=clean_audio_description,
-        default=False,
-    )
-    tts_parser.add_argument(
-        "--clean_strength",
-        type=float,
-        help=clean_strength_description,
-        choices=[(i / 10) for i in range(11)],
-        default=0.7,
-    )
-    tts_parser.add_argument(
-        "--export_format",
-        type=str,
-        help=export_format_description,
-        choices=["WAV", "MP3", "FLAC", "OGG", "M4A"],
-        default="WAV",
-    )
-    tts_parser.add_argument(
-        "--embedder_model",
-        type=str,
-        help=embedder_model_description,
-        choices=[
-            "contentvec",
-            "chinese-hubert-base",
-            "japanese-hubert-base",
-            "korean-hubert-base",
-            "custom",
-        ],
-        default="contentvec",
-    )
-    tts_parser.add_argument(
-        "--embedder_model_custom",
-        type=str,
-        help=embedder_model_custom_description,
-        default=None,
-    )
-    tts_parser.add_argument(
-        "--f0_file",
-        type=str,
-        help=f0_file_description,
-        default=None,
-    )
-
-    # Parser for 'model_information' mode
-    model_information_parser = subparsers.add_parser(
-        "model_information", help="Display information about a trained model."
-    )
-    model_information_parser.add_argument(
-        "--pth_path", type=str, help="Path to the .pth model file.", required=True
-    )
-
-    # Parser for 'model_blender' mode
-    model_blender_parser = subparsers.add_parser(
-        "model_blender", help="Fuse two RVC models together."
-    )
-    model_blender_parser.add_argument(
-        "--model_name", type=str, help="Name of the new fused model.", required=True
-    )
-    model_blender_parser.add_argument(
-        "--pth_path_1",
-        type=str,
-        help="Path to the first .pth model file.",
-        required=True,
-    )
-    model_blender_parser.add_argument(
-        "--pth_path_2",
-        type=str,
-        help="Path to the second .pth model file.",
-        required=True,
-    )
-    model_blender_parser.add_argument(
-        "--ratio",
-        type=float,
-        help="Ratio for blending the two models (0.0 to 1.0).",
-        choices=[(i / 10) for i in range(11)],
-        default=0.5,
-    )
-
-    # Parser for 'tensorboard' mode
-    subparsers.add_parser(
-        "tensorboard", help="Launch TensorBoard for monitoring training progress."
-    )
 
     # Parser for 'download' mode
     download_parser = subparsers.add_parser(
@@ -1694,13 +1366,6 @@ def parse_arguments():
         help="Download required executables.",
     )
 
-    # Parser for 'audio_analyzer' mode
-    audio_analyzer = subparsers.add_parser(
-        "audio_analyzer", help="Analyze an audio file."
-    )
-    audio_analyzer.add_argument(
-        "--input_path", type=str, help="Path to the input audio file.", required=True
-    )
 
     return parser.parse_args()
 
@@ -1839,53 +1504,10 @@ def main():
                 delay_feedback=args.delay_feedback,
                 delay_mix=args.delay_mix,
             )
-        elif args.mode == "tts":
-            run_tts_script(
-                tts_file=args.tts_file,
-                tts_text=args.tts_text,
-                tts_voice=args.tts_voice,
-                tts_rate=args.tts_rate,
-                pitch=args.pitch,
-                filter_radius=args.filter_radius,
-                index_rate=args.index_rate,
-                volume_envelope=args.volume_envelope,
-                protect=args.protect,
-                hop_length=args.hop_length,
-                f0_method=args.f0_method,
-                output_tts_path=args.output_tts_path,
-                output_rvc_path=args.output_rvc_path,
-                pth_path=args.pth_path,
-                index_path=args.index_path,
-                split_audio=args.split_audio,
-                f0_autotune=args.f0_autotune,
-                f0_autotune_strength=args.f0_autotune_strength,
-                clean_audio=args.clean_audio,
-                clean_strength=args.clean_strength,
-                export_format=args.export_format,
-                embedder_model=args.embedder_model,
-                embedder_model_custom=args.embedder_model_custom,
-                f0_file=args.f0_file,
-            )
-        elif args.mode == "model_information":
-            run_model_information_script(
-                pth_path=args.pth_path,
-            )
-        elif args.mode == "model_blender":
-            run_model_blender_script(
-                model_name=args.model_name,
-                pth_path_1=args.pth_path_1,
-                pth_path_2=args.pth_path_2,
-                ratio=args.ratio,
-            )
-        elif args.mode == "tensorboard":
-            run_tensorboard_script()
+        
         elif args.mode == "download":
             run_download_script(
                 model_link=args.model_link,
-            )
-        elif args.mode == "audio_analyzer":
-            run_audio_analyzer_script(
-                input_path=args.input_path,
             )
     except Exception as error:
         print(f"An error occurred during execution: {error}")
