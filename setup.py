@@ -47,17 +47,28 @@ elif sys.platform == "win32":
 
 # Optional dependencies
 extras_require = {
-    "dev": ["pytest", "black", "flake8"],
-    "docs": ["sphinx", "sphinx_rtd_theme"],
+    "dev": [
+        "pytest",
+        "black",
+        "flake8",
+    ],
+    "docs": [
+        "sphinx",
+        "sphinx_rtd_theme",
+    ],
 }
+
+# Read the long description from README.md
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
 # Setup configuration
 setup(
     name="rvc_cli",
     version="1.7.0",
-    long_description=open('README.md').read(),
-    long_description_content_type='text/markdown',
-    readme="README.md",
+    description="A CLI tool for RVC",  # Update this with your short project description.
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     license="MIT",
     packages=find_packages(include=["rvc_cli", "rvc_cli.*"]),
     install_requires=install_requires,
