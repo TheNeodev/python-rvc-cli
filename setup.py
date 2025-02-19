@@ -66,7 +66,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="rvc_cli",
     version="1.7.0",
-    description="A CLI tool for RVC",  # Update this with your short project description.
+    description="A simple, high-quality voice conversion tool.",  # Update this with your short project description.
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",
