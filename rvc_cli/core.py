@@ -29,7 +29,7 @@ def import_voice_converter():
 
 @lru_cache(maxsize=1)
 def get_config():
-    from rvc.configs.config import Config
+    from rvc_cli.rvc.configs.config import Config
 
     return Config()
 
