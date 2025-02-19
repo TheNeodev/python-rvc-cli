@@ -23,6 +23,7 @@ pip install rvc-cli
 python rvc-cli -h
 ```
 
+---
 
 <div align="center">
 
