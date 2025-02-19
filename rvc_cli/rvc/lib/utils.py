@@ -23,7 +23,7 @@ logging.getLogger("torch").setLevel(logging.ERROR)
 now_dir = os.getcwd()
 sys.path.append(now_dir)
 
-base_path = os.path.join(now_dir, "rvc", "models", "formant", "stftpitchshift")
+base_path = os.path.join(now_dir, "rvc_cli", "rvc", "models", "formant", "stftpitchshift")
 stft = base_path + ".exe" if sys.platform == "win32" else base_path
 
 
