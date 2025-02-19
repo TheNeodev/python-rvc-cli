@@ -208,7 +208,7 @@ class Pipeline:
         self.autotune = Autotune(self.ref_freqs)
         self.note_dict = self.autotune.note_dict
         self.model_rmvpe = RMVPE0Predictor(
-            os.path.join("rvc", "models", "predictors", "rmvpe.pt"),
+            os.path.join("rvc_cli", "rvc", "models", "predictors", "rmvpe.pt"),
             is_half=self.is_half,
             device=self.device,
         )
@@ -300,7 +300,7 @@ class Pipeline:
                 f0 = f0[1:]
             elif method == "fcpe":
                 self.model_fcpe = FCPEF0Predictor(
-                    os.path.join("rvc", "models", "predictors", "fcpe.pt"),
+                    os.path.join("rvc_cli", "rvc", "models", "predictors", "fcpe.pt"),
                     f0_min=int(f0_min),
                     f0_max=int(f0_max),
                     dtype=torch.float32,
@@ -359,7 +359,7 @@ class Pipeline:
             f0 = self.model_rmvpe.infer_from_audio(x, thred=0.03)
         elif f0_method == "fcpe":
             self.model_fcpe = FCPEF0Predictor(
-                os.path.join("rvc", "models", "predictors", "fcpe.pt"),
+                os.path.join("rvc_cli", "rvc", "models", "predictors", "fcpe.pt"),
                 f0_min=int(self.f0_min),
                 f0_max=int(self.f0_max),
                 dtype=torch.float32,
