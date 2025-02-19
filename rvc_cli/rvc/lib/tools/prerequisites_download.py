@@ -1,7 +1,19 @@
+#@title Download URL Audio
+
 import os
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 import requests
+import sys
+import pdb
+import traceback
+
+# Automatically invoke the debugger on an unhandled exception.
+def debug_excepthook(exc_type, exc_value, exc_traceback):
+    traceback.print_exception(exc_type, exc_value, exc_traceback)
+    pdb.post_mortem(exc_traceback)
+
+sys.excepthook = debug_excepthook
 
 url_base = "https://huggingface.co/IAHispano/Applio/resolve/main/Resources"
 
@@ -13,9 +25,9 @@ executables_list = [
 ]
 
 folder_mapping_list = {
-    "embedders/contentvec/": "rvc/models/embedders/contentvec/",
-    "predictors/": "rvc/models/predictors/",
-    "formant/": "rvc/models/formant/",
+    "embedders/contentvec/": ".rvc_cli/rvc/models/embedders/contentvec/",
+    "predictors/": ".rvc_cli/rvc/models/predictors/",
+    "formant/": ".rvc_cli/rvc/models/formant/",
 }
 
 
