@@ -2,7 +2,10 @@
 
 # python rvc cli
 
-A simple, high-quality voice conversion tool.
+
+---
+
+**A simple, high-quality voice conversion tool.**
 
 </div>
 
@@ -19,3 +22,10 @@ pip install rvc-cli
 ```
 python rvc-cli -h
 ```
+
+
+<div align="center">
+
+Thanks to [rvc-cli](https://github.com/blaisewf/rvc-cli.git) by [blaisewf](https://github.com/blaisewf) for this project base
+
+</div>
