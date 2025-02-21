@@ -6,6 +6,7 @@ import subprocess
 from functools import lru_cache
 from distutils.util import strtobool
 from rvc_cli.rvc.lib.tools.model_download import model_download_pipeline
+from rvc_cli.rvc.lib.tools.prerequisites_download import prequisites_download_pipeline
 
 
 
@@ -1492,7 +1493,16 @@ def main():
                 delay_feedback=args.delay_feedback,
                 delay_mix=args.delay_mix,
             )
-        
+
+        elif args.mode == "prerequisites":
+            run_prerequisites_script(
+                pretraineds_v1_f0=args.pretraineds_v1_f0,
+                pretraineds_v1_nof0=args.pretraineds_v1_nof0,
+                pretraineds_v2_f0=args.pretraineds_v2_f0,
+                pretraineds_v2_nof0=args.pretraineds_v2_nof0,
+                models=args.models,
+                exe=args.exe,
+            )
         elif args.mode == "download":
             run_download_script(
                 model_link=args.model_link,
