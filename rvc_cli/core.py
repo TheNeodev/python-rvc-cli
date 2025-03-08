@@ -6,7 +6,7 @@ import subprocess
 from functools import lru_cache
 from distutils.util import strtobool
 from rvc_cli.rvc.lib.tools.model_download import model_download_pipeline
-from rvc_cli.rvc.lib.tools.prerequisites_download import prequisites_download_pipeline
+from rvc_cli.rvc.lib.tools.prerequisites import prequisites_download_pipeline
 
 
 
