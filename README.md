@@ -16,6 +16,13 @@
 ```
 pip install rvc-cli
 ```
+## Install needed dependencies
+
+```
+pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --upgrade --index-url https://download.pytorch.org/whl/cu121 
+
+pip install numpy==1.23.5
+```
 
 ## usage
 
