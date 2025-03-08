@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rvc_cli"
+version = "1.7.0"
+description = "A simple, high-quality voice conversion tool."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.31.0,<2.32.0",
+    "tqdm",
+    "wget",
+    "ffmpeg-python>=0.2.0",
+    "faiss-cpu==1.7.3",
+    "soundfile==0.12.1",
+    "noisereduce",
+    "pedalboard",
+    "stftpitchshift",
+    "yt-dlp==2025.01.26",
+    "audio-separator[gpu]==0.28.5",
+    "torch==2.3.1",
+    "torchaudio==2.3.1",
+    "torchvision==0.18.1",
+    "torchcrepe==0.0.23",
+    "torchfcpe",
+    "libf0",
+    "transformers==4.44.2",
+    "matplotlib==3.7.2",
+    "tensorboard",
+    "tensorboardX",
+    "pypresence",
+    "beautifulsoup4",
+    "flask",
+    # macOS-specific dependencies
+    "pip>=23.3; sys_platform == 'darwin'",
+    "wheel; sys_platform == 'darwin'",
+    "PyYAML; sys_platform == 'darwin'",
+    "omegaconf>=2.0.6; sys_platform == 'darwin'",
+    "certifi>=2023.07.22; sys_platform == 'darwin'",
+    "antlr4-python3-runtime==4.8; sys_platform == 'darwin'",
+    "numba==0.57.0; sys_platform == 'darwin'",
+    # Linux-specific dependency
+    "numba>=0.57.0; sys_platform == 'linux'",
+    # Windows-specific dependency
+    "numba==0.57.0; sys_platform == 'win32'",
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.setuptools.packages.find]
+include = ["rvc_cli", "rvc_cli.*"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "flake8",
+]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+]
+
+[project.scripts]
+rvc-cli = "rvc_cli.core:main"
