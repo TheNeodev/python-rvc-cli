@@ -1,3 +1,12 @@
+"""
+Note:
+If you encounter the error:
+    "Cannot uninstall blinker 1.4 ..."
+this is due to pip attempting to uninstall a system-installed package.
+It is recommended to install this package in a virtual environment or run:
+    pip install --ignore-installed .
+"""
+
 from setuptools import setup, find_packages
 import sys
 
@@ -66,7 +75,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="rvc_cli",
     version="1.7.0",
-    description="A simple, high-quality voice conversion tool.",  # Update this with your short project description.
+    description="A simple, high-quality voice conversion tool.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",
